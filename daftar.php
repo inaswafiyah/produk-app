@@ -1,33 +1,44 @@
 <?php
 require __DIR__ . '/config.php';
-$res = $mysqli->query("SELECT id, nama, harga, deskripsi, created_at FROM produk ORDER BY id DESC");
+
+// Cek filter kategori
+$kategori = $_GET['kategori'] ?? '';
+
+if ($kategori) {
+  $stmt = $mysqli->prepare("SELECT id, nama, harga, deskripsi, kategori, created_at FROM produk WHERE kategori = ? ORDER BY id DESC");
+  $stmt->bind_param("s", $kategori);
+  $stmt->execute();
+  $res = $stmt->get_result();
+} else {
+  $res = $mysqli->query("SELECT id, nama, harga, deskripsi, kategori, created_at FROM produk ORDER BY id DESC");
+}
 ?>
 <!doctype html>
 <html lang="id">
 <head>
   <meta charset="utf-8">
   <title>Daftar Produk</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body{font-family:system-ui,Arial;margin:24px;max-width:960px}
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:10px;border:1px solid #ddd;vertical-align:top}
-    th{background:#f7f7f7;text-align:left}
-    nav a{margin-right:12px}
-  </style>
 </head>
 <body>
   <h1>Daftar Produk</h1>
-  <nav>
-    <a href="index.php">+ Tambah Produk</a>
-  </nav>
-  <table>
+  <form method="get">
+    <label>Filter Kategori:</label>
+    <select name="kategori">
+      <option value="">-- Semua --</option>
+      <option value="Skincare" <?= $kategori==='Skincare'?'selected':'' ?>>Skincare</option>
+      <option value="Makeup" <?= $kategori==='Makeup'?'selected':'' ?>>Makeup</option>
+      <option value="Haircare" <?= $kategori==='Haircare'?'selected':'' ?>>Haircare</option>
+    </select>
+    <button type="submit">Terapkan</button>
+  </form>
+  <table border="1" cellpadding="10">
     <thead>
       <tr>
         <th>ID</th>
         <th>Nama</th>
         <th>Harga (Rp)</th>
         <th>Deskripsi</th>
+        <th>Kategori</th>
         <th>Dibuat</th>
       </tr>
     </thead>
@@ -38,6 +49,7 @@ $res = $mysqli->query("SELECT id, nama, harga, deskripsi, created_at FROM produk
         <td><?= htmlspecialchars($row['nama']) ?></td>
         <td><?= number_format((int)$row['harga'], 0, ',', '.') ?></td>
         <td><?= nl2br(htmlspecialchars($row['deskripsi'])) ?></td>
+        <td><?= htmlspecialchars($row['kategori']) ?></td>
         <td><?= htmlspecialchars($row['created_at']) ?></td>
       </tr>
     <?php endwhile; ?>
@@ -45,4 +57,3 @@ $res = $mysqli->query("SELECT id, nama, harga, deskripsi, created_at FROM produk
   </table>
 </body>
 </html>
-

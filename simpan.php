@@ -9,9 +9,10 @@ function redirect_with(array $params) {
 }
 
 // Ambil & rapikan input
-$nama = trim($_POST['nama'] ?? '');
-$harga = trim($_POST['harga'] ?? '');
+$nama      = trim($_POST['nama'] ?? '');
+$harga     = trim($_POST['harga'] ?? '');
 $deskripsi = trim($_POST['deskripsi'] ?? '');
+$kategori  = trim($_POST['kategori'] ?? '');
 
 // Validasi sederhana (server-side, WAJIB)
 $errors = [];
@@ -20,6 +21,7 @@ if ($harga === '')           $errors[] = 'Harga wajib diisi.';
 elseif (!ctype_digit($harga) || (int)$harga < 0)
                              $errors[] = 'Harga harus angka bulat ≥ 0.';
 if ($deskripsi === '')       $errors[] = 'Deskripsi wajib diisi.';
+if ($kategori === '')        $errors[] = 'Kategori wajib dipilih.';
 
 if ($errors) {
   redirect_with(['error' => implode(' ', $errors)]);
@@ -27,14 +29,14 @@ if ($errors) {
 
 // Simpan (prepared statement untuk cegah SQL injection)
 $stmt = $mysqli->prepare(
-  "INSERT INTO produk (nama, harga, deskripsi, created_at) VALUES (?, ?, ?, NOW())"
+  "INSERT INTO produk (nama, harga, deskripsi, kategori, created_at) VALUES (?, ?, ?, ?, NOW())"
 );
 if (!$stmt) {
   redirect_with(['error' => 'Gagal menyiapkan query: ' . $mysqli->error]);
 }
 
 $hargaInt = (int)$harga;
-$stmt->bind_param('sis', $nama, $hargaInt, $deskripsi);
+$stmt->bind_param('siss', $nama, $hargaInt, $deskripsi, $kategori);
 
 if ($stmt->execute()) {
   redirect_with(['sukses' => 'Produk berhasil disimpan.']);

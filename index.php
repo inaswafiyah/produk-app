@@ -14,7 +14,7 @@ $error  = $_GET['error']  ?? '';
     .box{padding:16px;border:1px solid #ddd;border-radius:12px}
     .row{margin-bottom:12px}
     label{display:block;margin-bottom:6px;font-weight:600}
-    input, textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px}
+    input, textarea, select{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px}
     button{padding:10px 16px;border:0;border-radius:8px;cursor:pointer}
     .btn{background:#0d6efd;color:#fff}
     .info{padding:10px;border-radius:8px;margin-bottom:12px}
@@ -50,6 +50,15 @@ $error  = $_GET['error']  ?? '';
       <div class="row">
         <label for="deskripsi">Deskripsi</label>
         <textarea id="deskripsi" name="deskripsi" rows="4" placeholder="Tulis deskripsi produk..." required></textarea>
+      </div>
+      <div class="row">
+        <label for="kategori">Kategori:</label>
+        <select name="kategori" id="kategori" required>
+          <option value="">-- Pilih Kategori --</option>
+          <option value="Skincare">Skincare</option>
+          <option value="Makeup">Makeup</option>
+          <option value="Haircare">Haircare</option>
+        </select>
       </div>
       <button class="btn" type="submit">Simpan</button>
     </form>
