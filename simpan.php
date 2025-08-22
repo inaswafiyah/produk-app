@@ -27,16 +27,21 @@ if ($errors) {
   redirect_with(['error' => implode(' ', $errors)]);
 }
 
+// Proses upload gambar
+$imageName = '';
+if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+  $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+  $imageName = uniqid('img_') . '.' . $ext;
+  move_uploaded_file($_FILES['image']['tmp_name'], 'uploads/' . $imageName);
+}
+
 // Simpan (prepared statement untuk cegah SQL injection)
-$stmt = $mysqli->prepare(
-  "INSERT INTO produk (nama, harga, deskripsi, kategori, created_at) VALUES (?, ?, ?, ?, NOW())"
-);
+$stmt = $mysqli->prepare("INSERT INTO produk (nama, harga, deskripsi, kategori, image) VALUES (?, ?, ?, ?, ?)");
 if (!$stmt) {
   redirect_with(['error' => 'Gagal menyiapkan query: ' . $mysqli->error]);
 }
 
-$hargaInt = (int)$harga;
-$stmt->bind_param('siss', $nama, $hargaInt, $deskripsi, $kategori);
+$stmt->bind_param("sdsss", $nama, $harga, $deskripsi, $kategori, $imageName);
 
 if ($stmt->execute()) {
   redirect_with(['sukses' => 'Produk berhasil disimpan.']);
